@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --font-manrope: var(--font-manrope), sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
+
+  /* Custom Wish List Design System Color Tokens */
+  --color-primary: #032121;
+  --color-primary-container: #1a3636;
+  --color-on-primary-container: #829f9f;
+  --color-primary-fixed: #cae8e8;
+  --color-primary-fixed-dim: #aecccc;
+
+  --color-secondary: #6f5b3d;
+  --color-secondary-container: #f6dcb5;
+  --color-on-secondary-container: #736041;
+
+  --color-tertiary: #0d201a;
+  --color-tertiary-container: #23352f;
+  --color-on-tertiary-container: #8a9e96;
+
+  --color-surface-background: #f9f9fb;
+  --color-surface-dim: #d9dadc;
+  --color-surface-bright: #f9f9fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f3f5;
+  --color-surface-container: #eeeef0;
+  --color-surface-container-high: #e8e8ea;
+  --color-surface-container-highest: #e2e2e4;
+
+  --color-on-surface: #1a1c1d;
+  --color-on-surface-variant: #414848;
+
+  --color-outline-color: #727878;
+  --color-outline-variant: #c1c8c7;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+}
+
+/* Base custom styles */
+:root {
+  --font-manrope: 'Manrope', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  
+  /* Touch screen improvements */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Dark mode simulation class styling overrides */
+.dark {
+  --color-surface-background: #0d1313;
+  --color-surface-dim: #171d1d;
+  --color-surface-bright: #121818;
+  --color-surface-container-lowest: #141a1a;
+  --color-surface-container-low: #181f1f;
+  --color-surface-container: #1d2525;
+  --color-surface-container-high: #232d2d;
+  --color-surface-container-highest: #2a3636;
+
+  --color-on-surface: #e1e3e3;
+  --color-on-surface-variant: #b0b4b4;
+
+  --color-outline-color: #8c9292;
+  --color-outline-variant: #434848;
+  
+  --color-primary: #aecccc;
+  --color-primary-container: #cae8e8;
+  --color-on-primary-container: #032121;
+}
+
+body {
+  background-color: var(--color-surface-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-inter);
+  overflow-x: hidden;
+  overscroll-behavior-y: contain; /* Prevents pull-to-refresh on mobile */
+}
+
+/* Hide scrollbar utility for horizontal scroll lists like categories */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom premium ambient shadow definitions from DESIGN.md */
+.shadow-premium {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-premium-active {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}

@@ -1,0 +1,17 @@
+{
+  "name": "WishList Pro Tracker",
+  "short_name": "WishList Pro",
+  "description": "A premium mobile-first dashboard to track, catalog, and refine your wishes.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f9f9fb",
+  "theme_color": "#032121",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
