@@ -10,7 +10,7 @@ export interface WishlistItem {
   specialNotes?: string;
   store: string;
   category: string;
-  availability: 'In Stock' | 'Out of Stock' | 'Price Drop';
+  availability: 'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued';
   link?: string;
   bought: boolean;
   createdAt: string;
@@ -54,7 +54,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     specialNotes: 'Perfect matching accent for the main workspace setup.',
     store: 'IKEA',
     category: 'Home Decor',
-    availability: 'Price Drop',
+    availability: 'Medium',
     link: 'https://www.ikea.com',
     bought: false,
     createdAt: new Date().toISOString()
@@ -68,7 +68,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     specialNotes: 'Buy with brown switches. Add custom keycaps later.',
     store: 'Best Buy',
     category: 'Tech',
-    availability: 'In Stock',
+    availability: 'Rare',
     link: 'https://www.bestbuy.com',
     bought: false,
     createdAt: new Date().toISOString()
@@ -82,7 +82,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     specialNotes: 'Size 10 fits best. Fits slightly large.',
     store: 'Local Shop',
     category: 'Apparel',
-    availability: 'Out of Stock',
+    availability: 'Discontinued',
     bought: true,
     createdAt: new Date().toISOString()
   }

@@ -44,10 +44,14 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
   const boughtValue = wishlistItems.filter(item => item.bought).reduce((acc, item) => acc + item.price, 0);
   const wantedValue = totalValue - boughtValue;
 
-  const availabilityColors = {
-    'In Stock': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/30',
-    'Out of Stock': 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/30',
-    'Price Drop': 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/30',
+  const availabilityColors: Record<string, string> = {
+    'High': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/20',
+    'High-Medium': 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200/20',
+    'Medium': 'bg-secondary-container text-on-secondary-container border border-secondary-container/20',
+    'Medium-Low': 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/20',
+    'Low': 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 border border-orange-200/20',
+    'Rare': 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-300 border border-fuchsia-200/20',
+    'Discontinued': 'bg-error-container text-on-error-container border border-error-container/20',
   };
 
   return (
@@ -161,11 +165,13 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
       {/* Wish list grid layout */}
       <div className="px-4 flex-1">
         {filteredItems.length === 0 ? (
-          <div className="text-center py-16 px-4 bg-surface-container-low rounded-3xl border border-outline-variant/20">
-            <Heart className="mx-auto text-outline-variant mb-3" size={36} strokeWidth={1.5} />
-            <p className="text-sm font-semibold text-on-surface">No wishlist items found</p>
-            <p className="text-xs text-on-surface-variant/70 mt-1 max-w-[200px] mx-auto">
-              Create a wish list item to track your desired products!
+          <div className="text-center py-14 px-6 bg-surface-container-low rounded-3xl border border-outline-variant/15 shadow-inner flex flex-col items-center mx-1">
+            <div className="w-14 h-14 rounded-full bg-primary/5 dark:bg-primary/10 flex items-center justify-center mb-4">
+              <Heart className="text-primary dark:text-primary-fixed-dim" size={26} strokeWidth={2} />
+            </div>
+            <p className="font-manrope text-base font-extrabold text-on-surface">Your Wishlist is Empty</p>
+            <p className="text-xs text-on-surface-variant/75 mt-1.5 max-w-[220px] leading-relaxed">
+              Track all your favorite items, rarities, and stores in one clean offline-first place.
             </p>
           </div>
         ) : (
@@ -174,8 +180,8 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
               <div 
                 key={item.id} 
                 onClick={() => onSelectItem(item)}
-                className={`relative bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-premium active:scale-[0.98] transition-all flex flex-col h-full group cursor-pointer ${
-                  item.bought ? 'opacity-70' : ''
+                className={`relative bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-premium hover:shadow-premium-active touch-highlight flex flex-col h-full group cursor-pointer ${
+                  item.bought ? 'opacity-65' : ''
                 }`}
               >
                 

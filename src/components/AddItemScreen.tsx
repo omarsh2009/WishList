@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Camera, Save, ArrowLeft, Image as ImageIcon, Sparkles, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Camera, Save, ArrowLeft, Image as ImageIcon, Upload, AlertCircle } from 'lucide-react';
 import { useWishlistStore, WishlistItem } from '../store/useWishlistStore';
 
 interface AddItemScreenProps {
@@ -32,11 +32,12 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   const [specialNotes, setSpecialNotes] = useState('');
   const [store, setStore] = useState('');
   const [category, setCategory] = useState('');
-  const [availability, setAvailability] = useState<'In Stock' | 'Out of Stock' | 'Price Drop'>('In Stock');
+  const [availability, setAvailability] = useState<'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued'>('Medium');
   const [link, setLink] = useState('');
 
   const [validationError, setValidationError] = useState('');
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load edit values
   useEffect(() => {
@@ -96,6 +97,79 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   const handlePickStockPhoto = (url: string) => {
     setPhoto(url);
     setShowPhotoPicker(false);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setValidationError('Please select a valid image file.');
+      return;
+    }
+
+    // Limit maximum raw file size to 15MB to prevent browser crash during loading
+    const MAX_INPUT_SIZE = 15 * 1024 * 1024;
+    if (file.size > MAX_INPUT_SIZE) {
+      setValidationError('This image file is too large. Please upload an image smaller than 15MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const originalBase64 = event.target?.result as string;
+      
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        const MAX_DIM = 800; // Optimal mobile card dimension
+
+        if (width > height) {
+          if (width > MAX_DIM) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          }
+        } else {
+          if (height > MAX_DIM) {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          // Compress to JPEG with 70% quality for optimal mobile visual look & tiny file size (~30KB)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          setPhoto(compressedBase64);
+        } else {
+          // Resilient fallback if canvas is not supported/fails
+          setPhoto(originalBase64);
+        }
+        setShowPhotoPicker(false);
+      };
+      
+      img.onerror = () => {
+        setValidationError('Failed to parse selected image file.');
+      };
+      
+      img.src = originalBase64;
+    };
+
+    reader.onerror = () => {
+      setValidationError('Failed to read selected image file.');
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -178,13 +252,28 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
                   </span>
                 </div>
               ))}
-              <div className="col-span-3 mt-1">
+              <div className="col-span-3 mt-1 flex flex-col gap-2">
                 <input 
                   type="text" 
                   placeholder="Or paste custom image URL..." 
                   className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-full px-4 py-1.5 text-xs text-on-surface outline-hidden focus:border-primary/50"
                   value={photo}
                   onChange={(e) => setPhoto(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={handleUploadClick}
+                  className="w-full py-2 px-3 rounded-full bg-primary text-white dark:bg-primary-container dark:text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-xs"
+                >
+                  <Upload size={12} />
+                  Upload from Local Device
+                </button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleFileUpload} 
                 />
               </div>
             </div>
@@ -236,9 +325,13 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
               value={availability}
               onChange={(e) => setAvailability(e.target.value as any)}
             >
-              <option value="In Stock">In Stock</option>
-              <option value="Out of Stock">Out of Stock</option>
-              <option value="Price Drop">Price Drop</option>
+              <option value="High">High</option>
+              <option value="High-Medium">High-Medium</option>
+              <option value="Medium">Medium</option>
+              <option value="Medium-Low">Medium-Low</option>
+              <option value="Low">Low</option>
+              <option value="Rare">Rare</option>
+              <option value="Discontinued">Discontinued</option>
             </select>
           </div>
 

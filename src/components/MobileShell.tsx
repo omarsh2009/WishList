@@ -109,7 +109,7 @@ export default function MobileShell() {
       </main>
 
       {/* 3. Sticky Bottom App Navigation Bar */}
-      <nav className="sticky bottom-0 z-40 bg-surface-background/95 backdrop-blur-md border-t border-outline-variant/20 flex justify-around items-center py-2.5 px-3 pb-safe shadow-2xl">
+      <nav className="sticky bottom-0 z-40 bg-surface-background/95 backdrop-blur-md border-t border-outline-variant/20 flex justify-around items-center py-2.5 px-3 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-2xl">
         
         {/* Navigation Button Home */}
         <button
@@ -117,15 +117,15 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('home');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-3 rounded-2xl active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
             activeTab === 'home' 
-              ? 'text-primary dark:text-primary-fixed-dim font-bold' 
-              : 'text-on-surface-variant/60'
+              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
+              : 'text-on-surface-variant/60 hover:text-on-surface'
           }`}
           aria-label="Wishlist feed"
         >
-          <Home size={20} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
-          <span className="text-[10px]">Wishes</span>
+          <Home size={19} strokeWidth={activeTab === 'home' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Wishes</span>
         </button>
 
         {/* Navigation Button Quick Look */}
@@ -134,15 +134,15 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('quicklook');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-3 rounded-2xl active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
             activeTab === 'quicklook' 
-              ? 'text-primary dark:text-primary-fixed-dim font-bold' 
-              : 'text-on-surface-variant/60'
+              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
+              : 'text-on-surface-variant/60 hover:text-on-surface'
           }`}
           aria-label="Quick look carousel"
         >
-          <Eye size={20} strokeWidth={activeTab === 'quicklook' ? 2.5 : 2} />
-          <span className="text-[10px]">Quick Look</span>
+          <Eye size={19} strokeWidth={activeTab === 'quicklook' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Quick Look</span>
         </button>
 
         {/* Navigation Button Add Item */}
@@ -151,15 +151,15 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('add');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-3 rounded-2xl active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
             activeTab === 'add' 
-              ? 'text-primary dark:text-primary-fixed-dim font-bold' 
-              : 'text-on-surface-variant/60'
+              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
+              : 'text-on-surface-variant/60 hover:text-on-surface'
           }`}
           aria-label="Add a wish item"
         >
-          <PlusCircle size={20} strokeWidth={activeTab === 'add' ? 2.5 : 2} />
-          <span className="text-[10px]">Add Item</span>
+          <PlusCircle size={19} strokeWidth={activeTab === 'add' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Add Item</span>
         </button>
 
         {/* Navigation Button Settings */}
@@ -168,15 +168,15 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('settings');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-3 rounded-2xl active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
             activeTab === 'settings' 
-              ? 'text-primary dark:text-primary-fixed-dim font-bold' 
-              : 'text-on-surface-variant/60'
+              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
+              : 'text-on-surface-variant/60 hover:text-on-surface'
           }`}
           aria-label="Application Settings"
         >
-          <Settings size={20} strokeWidth={activeTab === 'settings' ? 2.5 : 2} />
-          <span className="text-[10px]">Settings</span>
+          <Settings size={19} strokeWidth={activeTab === 'settings' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Settings</span>
         </button>
 
       </nav>

@@ -49,10 +49,14 @@ export default function QuickLookScreen({ onSelectItem }: QuickLookScreenProps) 
 
   const item = activeItems[currentIndex];
 
-  const availabilityColors = {
-    'In Stock': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/30',
-    'Out of Stock': 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200/30',
-    'Price Drop': 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/30',
+  const availabilityColors: Record<string, string> = {
+    'High': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/20',
+    'High-Medium': 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200/20',
+    'Medium': 'bg-secondary-container text-on-secondary-container border border-secondary-container/20',
+    'Medium-Low': 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/20',
+    'Low': 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 border border-orange-200/20',
+    'Rare': 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-300 border border-fuchsia-200/20',
+    'Discontinued': 'bg-error-container text-on-error-container border border-error-container/20',
   };
 
   return (

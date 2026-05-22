@@ -28,19 +28,23 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
   };
 
   // Determine availability styling
-  const availabilityColors = {
-    'In Stock': 'bg-primary-container text-on-primary-container dark:bg-emerald-950 dark:text-emerald-300',
-    'Out of Stock': 'bg-error-container text-on-error-container',
-    'Price Drop': 'bg-secondary-container text-on-secondary-container',
+  const availabilityColors: Record<string, string> = {
+    'High': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/20',
+    'High-Medium': 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200/20',
+    'Medium': 'bg-secondary-container text-on-secondary-container border border-secondary-container/20',
+    'Medium-Low': 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/20',
+    'Low': 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 border border-orange-200/20',
+    'Rare': 'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-300 border border-fuchsia-200/20',
+    'Discontinued': 'bg-error-container text-on-error-container border border-error-container/20',
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs transition-opacity duration-300">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 animate-fade-in">
       {/* Tap background to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal Drawer Sheet */}
-      <div className="relative z-10 w-full max-w-md bg-surface-container-lowest rounded-t-3xl shadow-2xl transition-transform duration-300 border-t border-outline-variant/30 flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="relative z-10 w-full max-w-md bg-surface-container-lowest rounded-t-3xl shadow-2xl border-t border-outline-variant/30 flex flex-col max-h-[92vh] overflow-hidden animate-slide-up">
         
         {/* Visual Swipe Handle Bar */}
         <div className="flex justify-center py-3">
