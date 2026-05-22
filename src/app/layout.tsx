@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Inter } from "next/font/google";
 import "./globals.css";
+import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -25,6 +26,15 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "WishList Pro",
   },
+  icons: {
+    icon: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -38,7 +48,6 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-  
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -64,6 +73,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <ServiceWorkerRegistrar />
         {children}
       </body>
     </html>
