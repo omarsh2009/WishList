@@ -99,7 +99,7 @@ export default function QuickLookScreen({ onSelectItem }: QuickLookScreenProps) 
                   {item.name}
                 </h3>
                 <span className="font-manrope text-base font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
-                  ${item.price.toFixed(2)}
+                  {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'}
                 </span>
               </div>
               

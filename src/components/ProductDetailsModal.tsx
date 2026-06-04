@@ -94,7 +94,7 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
                 {item.name}
               </h2>
               <span className="font-manrope text-2xl font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
-                ${item.price.toFixed(2)}
+                {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'}
               </span>
             </div>
             

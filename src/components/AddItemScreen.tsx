@@ -34,6 +34,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   const [category, setCategory] = useState('');
   const [availability, setAvailability] = useState<'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued'>('Medium');
   const [link, setLink] = useState('');
+  const [priceNotAvailable, setPriceNotAvailable] = useState(false);
 
   const [validationError, setValidationError] = useState('');
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
@@ -43,7 +44,8 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   useEffect(() => {
     if (editItem) {
       setName(editItem.name);
-      setPrice(editItem.price.toString());
+      setPrice(editItem.price !== null ? editItem.price.toString() : '');
+      setPriceNotAvailable(editItem.price === null);
       setPhoto(editItem.photo);
       setDescription(editItem.description);
       setSpecialNotes(editItem.specialNotes || '');
@@ -64,19 +66,24 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
     e.preventDefault();
     setValidationError('');
 
-    const parsedPrice = parseFloat(price);
+    let finalPrice: number | null = null;
+    if (!priceNotAvailable) {
+      const parsedPrice = parseFloat(price);
+      if (isNaN(parsedPrice) || parsedPrice < 0) {
+        setValidationError('Please enter a valid price (e.g. 29.99).');
+        return;
+      }
+      finalPrice = parsedPrice;
+    }
+
     if (!name.trim()) {
       setValidationError('Please enter a product name.');
-      return;
-    }
-    if (isNaN(parsedPrice) || parsedPrice < 0) {
-      setValidationError('Please enter a valid price (e.g. 29.99).');
       return;
     }
 
     const payload = {
       name: name.trim(),
-      price: parsedPrice,
+      price: finalPrice,
       photo: photo.trim(),
       description: description.trim(),
       specialNotes: specialNotes.trim() || undefined,
@@ -300,16 +307,31 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
         <div className="grid grid-cols-2 gap-4">
           
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="itemPrice" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-              Price ($) *
-            </label>
+            <div className="flex justify-between items-center">
+              <label htmlFor="itemPrice" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                Price ($) {priceNotAvailable ? '' : '*'}
+              </label>
+              <label className="flex items-center gap-1.5 text-[10px] text-on-surface-variant cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={priceNotAvailable} 
+                  onChange={(e) => {
+                    setPriceNotAvailable(e.target.checked);
+                    if (e.target.checked) setPrice('');
+                  }}
+                  className="rounded border-outline-variant/30 text-primary focus:ring-primary/20 bg-surface-container-lowest w-3 h-3"
+                />
+                <span>Not Available</span>
+              </label>
+            </div>
             <input 
               type="number" 
               id="itemPrice"
               step="0.01" 
-              placeholder="0.00" 
-              required
-              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner font-mono"
+              placeholder={priceNotAvailable ? "N/A" : "0.00"} 
+              required={!priceNotAvailable}
+              disabled={priceNotAvailable}
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner font-mono disabled:opacity-50 disabled:bg-surface-container"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />

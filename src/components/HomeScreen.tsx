@@ -34,14 +34,14 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
       return matchesSearch && matchesCategory && matchesBought;
     })
     .sort((a, b) => {
-      if (sortBy === 'PriceLowHigh') return a.price - b.price;
-      if (sortBy === 'PriceHighLow') return b.price - a.price;
+      if (sortBy === 'PriceLowHigh') return (a.price || 0) - (b.price || 0);
+      if (sortBy === 'PriceHighLow') return (b.price || 0) - (a.price || 0);
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
   // Math totals for dashboard
-  const totalValue = wishlistItems.reduce((acc, item) => acc + item.price, 0);
-  const boughtValue = wishlistItems.filter(item => item.bought).reduce((acc, item) => acc + item.price, 0);
+  const totalValue = wishlistItems.reduce((acc, item) => acc + (item.price || 0), 0);
+  const boughtValue = wishlistItems.filter(item => item.bought).reduce((acc, item) => acc + (item.price || 0), 0);
   const wantedValue = totalValue - boughtValue;
 
   const availabilityColors: Record<string, string> = {
@@ -229,7 +229,7 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
 
                   <div className="flex justify-between items-center mt-3 pt-2 border-t border-outline-variant/10">
                     <span className="text-sm font-extrabold text-primary dark:text-primary-fixed-dim">
-                      ${item.price.toFixed(2)}
+                      {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'}
                     </span>
                     <span className="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full font-medium">
                       {item.category}

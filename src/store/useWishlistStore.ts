@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 export interface WishlistItem {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
   photo: string;
   description: string;
   specialNotes?: string;
