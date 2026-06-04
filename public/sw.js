@@ -2,14 +2,14 @@
 // Resilient, true offline app-shell caching strategy.
 // Keeps Zustand localStorage persistence intact.
 
-const CACHE_NAME = 'wishlist-pro-v2';
+const CACHE_NAME = 'wishlist-pro-v3';
 
 // Core assets to pre-cache on install
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
+  '/launchericon-192x192.png',
+  '/launchericon-512x512.png',
 ];
 
 // Install Event
@@ -125,7 +125,7 @@ self.addEventListener('fetch', (event) => {
         .catch(() => {
           // Fallback placeholder for missing image assets offline
           if (isImageUrl) {
-            return caches.match('/icon-192x192.png');
+            return caches.match('/launchericon-192x192.png');
           }
           return null;
         });
