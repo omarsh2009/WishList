@@ -1,6 +1,21 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+export type IdeaStatus = 'Active' | 'Converted' | 'Archived';
+
+export interface Idea {
+  id: string;
+  title: string;
+  description?: string;
+  targetBudget?: number;
+  notes?: string;
+  category?: string;
+  createdAt: string;
+  status: IdeaStatus;
+  convertedDate?: string;
+  wishlistItemId?: string;
+}
+
 export interface WishlistItem {
   id: string;
   name: string;
@@ -18,6 +33,7 @@ export interface WishlistItem {
 
 interface WishlistState {
   wishlistItems: WishlistItem[];
+  ideas: Idea[];
   categories: string[];
   stores: string[];
   darkMode: boolean;
@@ -39,6 +55,12 @@ interface WishlistState {
   // Theme management
   setDarkMode: (enabled: boolean) => void;
   toggleDarkMode: () => void;
+  
+  // Idea management
+  addIdea: (idea: Omit<Idea, 'id' | 'createdAt' | 'status'>) => void;
+  updateIdea: (id: string, updatedFields: Partial<Idea>) => void;
+  deleteIdea: (id: string) => void;
+  convertToWishlistItem: (ideaId: string) => void;
 }
 
 const DEFAULT_CATEGORIES = ['Tech', 'Home Decor', 'Apparel', 'Books', 'Fitness', 'Lifestyle'];
@@ -92,6 +114,7 @@ export const useWishlistStore = create<WishlistState>()(
   persist(
     (set) => ({
       wishlistItems: INITIAL_WISHLIST,
+      ideas: [],
       categories: DEFAULT_CATEGORIES,
       stores: DEFAULT_STORES,
       darkMode: false,
@@ -163,6 +186,58 @@ export const useWishlistStore = create<WishlistState>()(
           }
         }
         return { darkMode: nextMode };
+      }),
+
+      addIdea: (idea) => set((state) => ({
+        ideas: [
+          ...state.ideas,
+          {
+            ...idea,
+            id: crypto.randomUUID(),
+            status: 'Active',
+            createdAt: new Date().toISOString(),
+          }
+        ]
+      })),
+      
+      updateIdea: (id, updatedFields) => set((state) => ({
+        ideas: state.ideas.map((idea) => 
+          idea.id === id ? { ...idea, ...updatedFields } : idea
+        )
+      })),
+      
+      deleteIdea: (id) => set((state) => ({
+        ideas: state.ideas.filter((idea) => idea.id !== id)
+      })),
+      
+      convertToWishlistItem: (ideaId) => set((state) => {
+        const idea = state.ideas.find(i => i.id === ideaId);
+        if (!idea || idea.status !== 'Active') return state;
+
+        const newWishlistItemId = crypto.randomUUID();
+        
+        const newWishlistItem: WishlistItem = {
+          id: newWishlistItemId,
+          name: idea.title,
+          price: null, // Price not available yet
+          photo: '', // To be added later
+          description: idea.description || '',
+          specialNotes: idea.notes,
+          store: state.stores.length > 0 ? state.stores[0] : 'Local Shop',
+          category: idea.category || (state.categories.length > 0 ? state.categories[0] : 'Lifestyle'),
+          availability: 'Medium',
+          bought: false,
+          createdAt: new Date().toISOString()
+        };
+
+        return {
+          wishlistItems: [...state.wishlistItems, newWishlistItem],
+          ideas: state.ideas.map(i => 
+            i.id === ideaId 
+              ? { ...i, status: 'Converted', convertedDate: new Date().toISOString(), wishlistItemId: newWishlistItemId } 
+              : i
+          )
+        };
       }),
     }),
     {

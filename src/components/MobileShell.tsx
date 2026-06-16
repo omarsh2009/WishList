@@ -1,18 +1,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Eye, PlusCircle, Settings, Gift } from 'lucide-react';
-import { useWishlistStore, WishlistItem } from '../store/useWishlistStore';
+import { Home, Eye, PlusCircle, Settings, Gift, Lightbulb } from 'lucide-react';
+import { useWishlistStore, WishlistItem, Idea } from '../store/useWishlistStore';
 import HomeScreen from './HomeScreen';
 import AddItemScreen from './AddItemScreen';
 import QuickLookScreen from './QuickLookScreen';
 import SettingsScreen from './SettingsScreen';
 import ProductDetailsModal from './ProductDetailsModal';
+import IdeasScreen from './IdeasScreen';
+import AddIdeaScreen from './AddIdeaScreen';
+import IdeaDetailsModal from './IdeaDetailsModal';
 
 export default function MobileShell() {
-  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'quicklook' | 'settings'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'ideas' | 'addIdea' | 'quicklook' | 'settings'>('home');
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<WishlistItem | null>(null);
+  const [selectedIdeaForDetails, setSelectedIdeaForDetails] = useState<Idea | null>(null);
   const [editingItem, setEditingItem] = useState<WishlistItem | null>(null);
+  const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
   
   const wishlistItems = useWishlistStore((state) => state.wishlistItems);
@@ -61,6 +66,31 @@ export default function MobileShell() {
     setActiveTab('home');
   };
 
+  // Idea actions
+  const handleSelectIdea = (idea: Idea) => {
+    setSelectedIdeaForDetails(idea);
+  };
+
+  const handleEditIdea = (idea: Idea) => {
+    setSelectedIdeaForDetails(null);
+    setEditingIdea(idea);
+    setActiveTab('addIdea');
+  };
+
+  const handleCloseIdeaDetails = () => {
+    setSelectedIdeaForDetails(null);
+  };
+
+  const handleCancelIdeaEdit = () => {
+    setEditingIdea(null);
+    setActiveTab('ideas');
+  };
+
+  const handleIdeaSaved = () => {
+    setEditingIdea(null);
+    setActiveTab('ideas');
+  };
+
   // Successful item save trigger
   const handleItemSaved = () => {
     setEditingItem(null);
@@ -98,6 +128,24 @@ export default function MobileShell() {
             onCancel={editingItem ? handleCancelEdit : undefined} 
           />
         )}
+
+        {activeTab === 'ideas' && (
+          <IdeasScreen 
+            onSelectIdea={handleSelectIdea} 
+            onCreateIdea={() => {
+              setEditingIdea(null);
+              setActiveTab('addIdea');
+            }}
+          />
+        )}
+
+        {activeTab === 'addIdea' && (
+          <AddIdeaScreen 
+            editIdea={editingIdea} 
+            onSaved={handleIdeaSaved} 
+            onCancel={editingIdea ? handleCancelIdeaEdit : undefined} 
+          />
+        )}
         
         {activeTab === 'quicklook' && (
           <QuickLookScreen onSelectItem={handleSelectItem} />
@@ -128,23 +176,6 @@ export default function MobileShell() {
           <span className="text-[10px] tracking-wide">Wishes</span>
         </button>
 
-        {/* Navigation Button Quick Look */}
-        <button
-          onClick={() => {
-            setEditingItem(null);
-            setActiveTab('quicklook');
-          }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
-            activeTab === 'quicklook' 
-              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
-              : 'text-on-surface-variant/60 hover:text-on-surface'
-          }`}
-          aria-label="Quick look carousel"
-        >
-          <Eye size={19} strokeWidth={activeTab === 'quicklook' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
-          <span className="text-[10px] tracking-wide">Quick Look</span>
-        </button>
-
         {/* Navigation Button Add Item */}
         <button
           onClick={() => {
@@ -160,6 +191,40 @@ export default function MobileShell() {
         >
           <PlusCircle size={19} strokeWidth={activeTab === 'add' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
           <span className="text-[10px] tracking-wide">Add Item</span>
+        </button>
+
+        {/* Navigation Button Ideas */}
+        <button
+          onClick={() => {
+            setEditingIdea(null);
+            setActiveTab('ideas');
+          }}
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+            (activeTab === 'ideas' || activeTab === 'addIdea')
+              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
+              : 'text-on-surface-variant/60 hover:text-on-surface'
+          }`}
+          aria-label="Ideas and Planning"
+        >
+          <Lightbulb size={19} strokeWidth={(activeTab === 'ideas' || activeTab === 'addIdea') ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Ideas</span>
+        </button>
+
+        {/* Navigation Button Quick Look */}
+        <button
+          onClick={() => {
+            setEditingItem(null);
+            setActiveTab('quicklook');
+          }}
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+            activeTab === 'quicklook' 
+              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
+              : 'text-on-surface-variant/60 hover:text-on-surface'
+          }`}
+          aria-label="Quick look carousel"
+        >
+          <Eye size={19} strokeWidth={activeTab === 'quicklook' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Quick Look</span>
         </button>
 
         {/* Navigation Button Settings */}
@@ -187,6 +252,23 @@ export default function MobileShell() {
           item={selectedItemForDetails}
           onClose={handleCloseDetails}
           onEdit={handleEditItem}
+        />
+      )}
+
+      {selectedIdeaForDetails && (
+        <IdeaDetailsModal
+          idea={selectedIdeaForDetails}
+          onClose={handleCloseIdeaDetails}
+          onEdit={handleEditIdea}
+          onViewWishlistItem={(id) => {
+            const item = wishlistItems.find(i => i.id === id);
+            if (item) {
+              handleCloseIdeaDetails();
+              setEditingItem(null);
+              setActiveTab('home');
+              setSelectedItemForDetails(item);
+            }
+          }}
         />
       )}
 
