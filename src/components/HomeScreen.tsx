@@ -1,37 +1,37 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, SlidersHorizontal, CheckCircle2, Circle, Heart, Info, DollarSign } from 'lucide-react';
+import { Search, SlidersHorizontal, CheckCircle2, Circle, Heart, Info, DollarSign, ShoppingBag } from 'lucide-react';
 import { useWishlistStore, WishlistItem } from '../store/useWishlistStore';
+import EmptyState from './ui/EmptyState';
 
 interface HomeScreenProps {
   onSelectItem: (item: WishlistItem) => void;
+  onNavigateToPurchased: () => void;
 }
 
-export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
+export default function HomeScreen({ onSelectItem, onNavigateToPurchased }: HomeScreenProps) {
   const wishlistItems = useWishlistStore((state) => state.wishlistItems);
   const categories = useWishlistStore((state) => state.categories);
-  const toggleBought = useWishlistStore((state) => state.toggleBought);
+  const markAsPurchased = useWishlistStore((state) => state.markAsPurchased);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [filterBought, setFilterBought] = useState<'All' | 'Wanted' | 'Bought'>('All');
   const [sortBy, setSortBy] = useState<'Newest' | 'PriceLowHigh' | 'PriceHighLow'>('Newest');
 
-  // Filter items
+  // Filter items (only active ones)
   const filteredItems = wishlistItems
     .filter((item) => {
+      // Exclude purchased items from Wishlist screen
+      if (item.isPurchased) return false;
+
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.store.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.description.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
-      
-      const matchesBought = filterBought === 'All' ||
-                            (filterBought === 'Wanted' && !item.bought) ||
-                            (filterBought === 'Bought' && item.bought);
 
-      return matchesSearch && matchesCategory && matchesBought;
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       if (sortBy === 'PriceLowHigh') return (a.price || 0) - (b.price || 0);
@@ -40,9 +40,12 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
     });
 
   // Math totals for dashboard
-  const totalValue = wishlistItems.reduce((acc, item) => acc + (item.price || 0), 0);
-  const boughtValue = wishlistItems.filter(item => item.bought).reduce((acc, item) => acc + (item.price || 0), 0);
-  const wantedValue = totalValue - boughtValue;
+  const activeItems = wishlistItems.filter(item => !item.isPurchased);
+  const purchasedItems = wishlistItems.filter(item => item.isPurchased);
+
+  const wantedValue = activeItems.reduce((acc, item) => acc + (item.price || 0), 0);
+  const purchasedValue = purchasedItems.reduce((acc, item) => acc + (item.purchaseInfo?.price ?? item.price ?? 0), 0);
+  const totalValue = wantedValue + purchasedValue;
 
   const availabilityColors: Record<string, string> = {
     'High': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/20',
@@ -75,14 +78,22 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
         <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden flex">
           <div 
             className="bg-secondary-container h-full transition-all duration-500" 
-            style={{ width: `${totalValue > 0 ? (boughtValue / totalValue) * 100 : 0}%` }}
+            style={{ width: `${totalValue > 0 ? (purchasedValue / totalValue) * 100 : 0}%` }}
           />
         </div>
         
         <div className="flex justify-between text-xs mt-2 text-white/70">
-          <span>{wishlistItems.filter(i => i.bought).length} Bought (${boughtValue.toFixed(0)})</span>
-          <span>{wishlistItems.filter(i => !i.bought).length} Wanted (${wantedValue.toFixed(0)})</span>
+          <span>{purchasedItems.length} Purchased (${purchasedValue.toFixed(0)})</span>
+          <span>{activeItems.length} Wanted (${wantedValue.toFixed(0)})</span>
         </div>
+
+        <button 
+          onClick={onNavigateToPurchased}
+          className="mt-4 w-full py-2.5 bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 border border-white/10 text-white cursor-pointer"
+        >
+          <ShoppingBag size={14} />
+          View Purchased Items ({purchasedItems.length})
+        </button>
       </div>
 
       {/* Persistent Sticky Search & Sort Controls */}
@@ -99,25 +110,8 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
         </div>
 
         {/* Filter and Sort Toggles */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-end gap-2">
           
-          {/* Bought / Wanted tab state selector */}
-          <div className="flex bg-surface-container p-1 rounded-full border border-outline-variant/20">
-            {(['All', 'Wanted', 'Bought'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilterBought(tab)}
-                className={`px-3 py-1 text-xs font-semibold rounded-full transition-all ${
-                  filterBought === tab 
-                    ? 'bg-surface-container-lowest text-primary dark:text-primary-fixed-dim shadow-xs' 
-                    : 'text-on-surface-variant/70 hover:text-on-surface'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
           {/* Sort Selection dropdown */}
           <div className="flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant/20 text-xs">
             <SlidersHorizontal size={12} className="text-on-surface-variant" />
@@ -165,24 +159,19 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
       {/* Wish list grid layout */}
       <div className="px-4 flex-1">
         {filteredItems.length === 0 ? (
-          <div className="text-center py-14 px-6 bg-surface-container-low rounded-3xl border border-outline-variant/15 shadow-inner flex flex-col items-center mx-1">
-            <div className="w-14 h-14 rounded-full bg-primary/5 dark:bg-primary/10 flex items-center justify-center mb-4">
-              <Heart className="text-primary dark:text-primary-fixed-dim" size={26} strokeWidth={2} />
-            </div>
-            <p className="font-manrope text-base font-extrabold text-on-surface">Your Wishlist is Empty</p>
-            <p className="text-xs text-on-surface-variant/75 mt-1.5 max-w-[220px] leading-relaxed">
-              Track all your favorite items, rarities, and stores in one clean offline-first place.
-            </p>
-          </div>
+          <EmptyState
+            icon={Heart}
+            title="Your Wishlist is Empty"
+            description="Track all your favorite items, rarities, and stores in one clean offline-first place."
+            className="mx-1"
+          />
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {filteredItems.map((item) => (
               <div 
                 key={item.id} 
                 onClick={() => onSelectItem(item)}
-                className={`relative bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-premium hover:shadow-premium-active touch-highlight flex flex-col h-full group cursor-pointer ${
-                  item.bought ? 'opacity-65' : ''
-                }`}
+                className="relative bg-surface-container-lowest border border-outline-variant/20 rounded-2xl overflow-hidden shadow-premium hover:shadow-premium-active touch-highlight flex flex-col h-full group cursor-pointer"
               >
                 
                 {/* Product Photo Thumbnail */}
@@ -199,20 +188,16 @@ export default function HomeScreen({ onSelectItem }: HomeScreenProps) {
                     {item.availability}
                   </span>
 
-                  {/* Immediate Mark as Bought checkbox tap target */}
+                  {/* Immediate Mark as Purchased checkbox tap target */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleBought(item.id);
+                      markAsPurchased(item.id);
                     }}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/45 backdrop-blur-xs text-white active:scale-90 transition-transform"
-                    aria-label={item.bought ? 'Mark as wanted' : 'Mark as bought'}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/45 backdrop-blur-xs text-white active:scale-90 transition-transform cursor-pointer"
+                    aria-label="Mark as purchased"
                   >
-                    {item.bought ? (
-                      <CheckCircle2 size={16} className="text-secondary-container" />
-                    ) : (
-                      <Circle size={16} className="text-white/80" />
-                    )}
+                    <Circle size={16} className="text-white/80" />
                   </button>
                 </div>
 

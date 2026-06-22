@@ -11,9 +11,10 @@ import ProductDetailsModal from './ProductDetailsModal';
 import IdeasScreen from './IdeasScreen';
 import AddIdeaScreen from './AddIdeaScreen';
 import IdeaDetailsModal from './IdeaDetailsModal';
+import PurchasedScreen from './PurchasedScreen';
 
 export default function MobileShell() {
-  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'ideas' | 'addIdea' | 'quicklook' | 'settings'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'ideas' | 'addIdea' | 'quicklook' | 'settings' | 'purchased'>('home');
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<WishlistItem | null>(null);
   const [selectedIdeaForDetails, setSelectedIdeaForDetails] = useState<Idea | null>(null);
   const [editingItem, setEditingItem] = useState<WishlistItem | null>(null);
@@ -110,7 +111,7 @@ export default function MobileShell() {
         </div>
         <div className="flex items-center">
           <span className="text-[10px] font-bold px-2.5 py-0.5 bg-surface-container rounded-full text-on-surface-variant">
-            {wishlistItems.length} Wishes
+            {wishlistItems.filter(i => !i.isPurchased).length} Wishes
           </span>
         </div>
       </header>
@@ -118,7 +119,10 @@ export default function MobileShell() {
       {/* 2. Main Content Screen Container Scrollport */}
       <main className="flex-1 flex flex-col overflow-y-auto no-scrollbar pt-2 bg-surface-background relative">
         {activeTab === 'home' && (
-          <HomeScreen onSelectItem={handleSelectItem} />
+          <HomeScreen 
+            onSelectItem={handleSelectItem} 
+            onNavigateToPurchased={() => setActiveTab('purchased')}
+          />
         )}
         
         {activeTab === 'add' && (
@@ -154,6 +158,13 @@ export default function MobileShell() {
         {activeTab === 'settings' && (
           <SettingsScreen />
         )}
+
+        {activeTab === 'purchased' && (
+          <PurchasedScreen 
+            onSelectItem={handleSelectItem}
+            onBack={() => setActiveTab('home')}
+          />
+        )}
       </main>
 
       {/* 3. Sticky Bottom App Navigation Bar */}
@@ -165,7 +176,7 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('home');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
             activeTab === 'home' 
               ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
               : 'text-on-surface-variant/60 hover:text-on-surface'
@@ -182,7 +193,7 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('add');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
             activeTab === 'add' 
               ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
               : 'text-on-surface-variant/60 hover:text-on-surface'
@@ -199,7 +210,7 @@ export default function MobileShell() {
             setEditingIdea(null);
             setActiveTab('ideas');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
             (activeTab === 'ideas' || activeTab === 'addIdea')
               ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
               : 'text-on-surface-variant/60 hover:text-on-surface'
@@ -216,7 +227,7 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('quicklook');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
             activeTab === 'quicklook' 
               ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
               : 'text-on-surface-variant/60 hover:text-on-surface'
@@ -233,7 +244,7 @@ export default function MobileShell() {
             setEditingItem(null);
             setActiveTab('settings');
           }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all ${
+          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
             activeTab === 'settings' 
               ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
               : 'text-on-surface-variant/60 hover:text-on-surface'

@@ -4,6 +4,8 @@ import React from 'react';
 import { X, ExternalLink, Check, Trash2, Tag, ShoppingBag, Eye, Heart } from 'lucide-react';
 import { WishlistItem, useWishlistStore } from '../store/useWishlistStore';
 
+import ConfirmModal from './ui/ConfirmModal';
+
 interface ProductDetailsModalProps {
   item: WishlistItem | null;
   onClose: () => void;
@@ -12,19 +14,28 @@ interface ProductDetailsModalProps {
 
 export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDetailsModalProps) {
   const deleteItem = useWishlistStore((state) => state.deleteItem);
-  const toggleBought = useWishlistStore((state) => state.toggleBought);
+  const markAsPurchased = useWishlistStore((state) => state.markAsPurchased);
+  const restoreToWishlist = useWishlistStore((state) => state.restoreToWishlist);
+
+  const [confirmAction, setConfirmAction] = React.useState<'restore' | 'delete' | null>(null);
 
   if (!item) return null;
 
-  const handleToggleBought = () => {
-    toggleBought(item.id);
+  const handleMarkAsPurchased = () => {
+    markAsPurchased(item.id);
+    onClose();
   };
 
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this wish list item?')) {
-      deleteItem(item.id);
-      onClose();
-    }
+  const executeRestore = () => {
+    restoreToWishlist(item.id);
+    setConfirmAction(null);
+    onClose();
+  };
+
+  const executeDelete = () => {
+    deleteItem(item.id);
+    setConfirmAction(null);
+    onClose();
   };
 
   // Determine availability styling
@@ -77,11 +88,11 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
             </span>
 
             {/* Bought Stamp */}
-            {item.bought && (
+            {item.isPurchased && (
               <div className="absolute inset-0 bg-primary/75 backdrop-blur-xs flex items-center justify-center">
                 <div className="border-4 border-white text-white px-6 py-2 rounded-xl text-xl font-bold uppercase tracking-wider transform -rotate-12 flex items-center gap-2">
                   <Check size={24} strokeWidth={3} />
-                  Bought
+                  Purchased
                 </div>
               </div>
             )}
@@ -137,21 +148,54 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
             </div>
           )}
 
+          {/* Purchase Details if available */}
+          {item.isPurchased && item.purchaseInfo && (
+            <div className="mb-5 p-3.5 bg-primary/5 dark:bg-primary/10 border border-primary/15 rounded-xl text-xs">
+              <span className="font-bold text-on-surface uppercase tracking-wider block mb-1.5">
+                Purchase Details
+              </span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-on-surface-variant">Purchase Date:</span>
+                <span className="font-semibold text-on-surface">
+                  {new Date(item.purchaseInfo.date).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+              {item.purchaseInfo.price !== null && (
+                <div className="flex justify-between items-center py-1 border-t border-outline-variant/10 mt-1">
+                  <span className="text-on-surface-variant">Purchase Price:</span>
+                  <span className="font-semibold text-on-surface">
+                    ${item.purchaseInfo.price.toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Action Row */}
           <div className="flex flex-col gap-3 mt-4">
             
             {/* Primary bought switch toggle */}
-            <button
-              onClick={handleToggleBought}
-              className={`w-full py-3.5 px-4 rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-md active:scale-95 ${
-                item.bought
-                  ? 'bg-surface-container-high text-on-surface border border-outline-variant'
-                  : 'bg-primary text-white dark:bg-primary-container dark:text-white hover:brightness-110'
-              }`}
-            >
-              <Check size={18} strokeWidth={2.5} />
-              {item.bought ? 'Mark as Wanted (Unbuy)' : 'Mark as Bought'}
-            </button>
+            {item.isPurchased ? (
+              <button
+                onClick={() => setConfirmAction('restore')}
+                className="w-full py-3.5 px-4 rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-md active:scale-95 bg-surface-container-high text-on-surface border border-outline-variant cursor-pointer"
+              >
+                <Check size={18} strokeWidth={2.5} />
+                Restore to Wishlist
+              </button>
+            ) : (
+              <button
+                onClick={handleMarkAsPurchased}
+                className="w-full py-3.5 px-4 rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-md active:scale-95 bg-primary text-white dark:bg-primary-container dark:text-white hover:brightness-110 cursor-pointer"
+              >
+                <Check size={18} strokeWidth={2.5} />
+                Mark as Purchased
+              </button>
+            )}
 
             <div className="grid grid-cols-3 gap-3">
               {/* Optional Store External Link */}
@@ -173,7 +217,7 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
 
               {/* Delete Button */}
               <button
-                onClick={handleDelete}
+                onClick={() => setConfirmAction('delete')}
                 className="py-3 px-4 rounded-full bg-error-container text-on-error-container font-semibold transition-all flex items-center justify-center gap-2 text-sm active:scale-95 shadow-xs"
                 aria-label="Delete wishlist item"
               >
@@ -194,6 +238,25 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
 
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmAction === 'restore'}
+        title="Restore to Wishlist"
+        message="Are you sure you want to move this item back to your active wishlist?"
+        confirmText="Restore"
+        onConfirm={executeRestore}
+        onCancel={() => setConfirmAction(null)}
+      />
+
+      <ConfirmModal
+        isOpen={confirmAction === 'delete'}
+        title="Delete Item"
+        message="Are you sure you want to delete this wish list item? This action cannot be undone."
+        confirmText="Delete"
+        isDestructive={true}
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Lightbulb, Plus, Calendar, Tag, DollarSign, ArrowRight } from 'lucide-react';
 import { useWishlistStore, Idea, IdeaStatus } from '../store/useWishlistStore';
+import EmptyState from './ui/EmptyState';
 
 interface IdeasScreenProps {
   onSelectIdea: (idea: Idea) => void;
@@ -70,15 +71,12 @@ export default function IdeasScreen({ onSelectIdea, onCreateIdea }: IdeasScreenP
       {/* Ideas Feed */}
       <div className="px-4 flex-1 flex flex-col gap-3">
         {filteredIdeas.length === 0 ? (
-          <div className="text-center py-14 px-6 bg-surface-container-low rounded-3xl border border-outline-variant/15 shadow-inner flex flex-col items-center mx-1 mt-4">
-            <div className="w-14 h-14 rounded-full bg-primary/5 dark:bg-primary/10 flex items-center justify-center mb-4">
-              <Lightbulb className="text-primary dark:text-primary-fixed-dim" size={26} strokeWidth={2} />
-            </div>
-            <p className="font-manrope text-base font-extrabold text-on-surface">No Ideas Found</p>
-            <p className="text-xs text-on-surface-variant/75 mt-1.5 max-w-[220px] leading-relaxed">
-              Jot down concepts, future purchases, and wish lists here before they become actual items.
-            </p>
-          </div>
+          <EmptyState
+            icon={Lightbulb}
+            title="No Ideas Found"
+            description="Jot down concepts, future purchases, and wish lists here before they become actual items."
+            className="mx-1 mt-4"
+          />
         ) : (
           filteredIdeas.map(idea => (
             <div 

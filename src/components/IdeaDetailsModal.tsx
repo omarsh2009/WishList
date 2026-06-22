@@ -3,6 +3,7 @@
 import React from 'react';
 import { X, Trash2, Tag, DollarSign, Calendar, RefreshCcw, ExternalLink, ArrowRight } from 'lucide-react';
 import { Idea, useWishlistStore } from '../store/useWishlistStore';
+import ConfirmModal from './ui/ConfirmModal';
 
 interface IdeaDetailsModalProps {
   idea: Idea | null;
@@ -15,20 +16,20 @@ export default function IdeaDetailsModal({ idea, onClose, onEdit, onViewWishlist
   const deleteIdea = useWishlistStore((state) => state.deleteIdea);
   const convertToWishlistItem = useWishlistStore((state) => state.convertToWishlistItem);
 
+  const [confirmAction, setConfirmAction] = React.useState<'convert' | 'delete' | null>(null);
+
   if (!idea) return null;
 
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this idea?')) {
-      deleteIdea(idea.id);
-      onClose();
-    }
+  const executeDelete = () => {
+    deleteIdea(idea.id);
+    setConfirmAction(null);
+    onClose();
   };
 
-  const handleConvert = () => {
-    if (confirm('Move this Idea to your Wishlist?')) {
-      convertToWishlistItem(idea.id);
-      onClose();
-    }
+  const executeConvert = () => {
+    convertToWishlistItem(idea.id);
+    setConfirmAction(null);
+    onClose();
   };
 
   const statusColors: Record<string, string> = {
@@ -122,7 +123,7 @@ export default function IdeaDetailsModal({ idea, onClose, onEdit, onViewWishlist
             
             {idea.status === 'Active' && (
               <button
-                onClick={handleConvert}
+                onClick={() => setConfirmAction('convert')}
                 className="w-full py-3.5 px-4 rounded-full bg-primary text-white dark:bg-primary-container font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-md active:scale-95 hover:brightness-110"
               >
                 <ArrowRight size={18} strokeWidth={2.5} />
@@ -149,7 +150,7 @@ export default function IdeaDetailsModal({ idea, onClose, onEdit, onViewWishlist
               </button>
 
               <button
-                onClick={handleDelete}
+                onClick={() => setConfirmAction('delete')}
                 className="py-3 px-4 rounded-full bg-error-container text-on-error-container font-semibold transition-all flex items-center justify-center gap-2 text-sm active:scale-95 shadow-xs"
               >
                 <Trash2 size={16} />
@@ -161,6 +162,25 @@ export default function IdeaDetailsModal({ idea, onClose, onEdit, onViewWishlist
 
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmAction === 'convert'}
+        title="Move to Wishlist"
+        message="Are you sure you want to move this Idea to your Wishlist? It will be marked as 'Converted'."
+        confirmText="Move"
+        onConfirm={executeConvert}
+        onCancel={() => setConfirmAction(null)}
+      />
+
+      <ConfirmModal
+        isOpen={confirmAction === 'delete'}
+        title="Delete Idea"
+        message="Are you sure you want to delete this idea? This action cannot be undone."
+        confirmText="Delete"
+        isDestructive={true}
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }

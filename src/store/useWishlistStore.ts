@@ -27,7 +27,11 @@ export interface WishlistItem {
   category: string;
   availability: 'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued';
   link?: string;
-  bought: boolean;
+  isPurchased: boolean;
+  purchaseInfo?: {
+    date: string;
+    price: number | null;
+  };
   createdAt: string;
 }
 
@@ -39,10 +43,11 @@ interface WishlistState {
   darkMode: boolean;
   
   // CRUD actions for items
-  addItem: (item: Omit<WishlistItem, 'id' | 'createdAt' | 'bought'>) => void;
+  addItem: (item: Omit<WishlistItem, 'id' | 'createdAt' | 'isPurchased' | 'purchaseInfo'>) => void;
   updateItem: (id: string, updatedFields: Partial<WishlistItem>) => void;
   deleteItem: (id: string) => void;
-  toggleBought: (id: string) => void;
+  markAsPurchased: (id: string) => void;
+  restoreToWishlist: (id: string) => void;
   
   // Category management
   addCategory: (category: string) => void;
@@ -78,7 +83,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     category: 'Home Decor',
     availability: 'Medium',
     link: 'https://www.ikea.com',
-    bought: false,
+    isPurchased: false,
     createdAt: new Date().toISOString()
   },
   {
@@ -92,7 +97,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     category: 'Tech',
     availability: 'Rare',
     link: 'https://www.bestbuy.com',
-    bought: false,
+    isPurchased: false,
     createdAt: new Date().toISOString()
   },
   {
@@ -105,7 +110,11 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     store: 'Local Shop',
     category: 'Apparel',
     availability: 'Discontinued',
-    bought: true,
+    isPurchased: true,
+    purchaseInfo: {
+      date: new Date().toISOString(),
+      price: 245.00
+    },
     createdAt: new Date().toISOString()
   }
 ];
@@ -125,7 +134,7 @@ export const useWishlistStore = create<WishlistState>()(
           {
             ...item,
             id: crypto.randomUUID(),
-            bought: false,
+            isPurchased: false,
             createdAt: new Date().toISOString(),
           }
         ]
@@ -141,9 +150,27 @@ export const useWishlistStore = create<WishlistState>()(
         wishlistItems: state.wishlistItems.filter((item) => item.id !== id)
       })),
       
-      toggleBought: (id) => set((state) => ({
+      markAsPurchased: (id) => set((state) => ({
         wishlistItems: state.wishlistItems.map((item) => 
-          item.id === id ? { ...item, bought: !item.bought } : item
+          item.id === id 
+            ? { 
+                ...item, 
+                isPurchased: true, 
+                purchaseInfo: { date: new Date().toISOString(), price: item.price } 
+              } 
+            : item
+        )
+      })),
+      
+      restoreToWishlist: (id) => set((state) => ({
+        wishlistItems: state.wishlistItems.map((item) => 
+          item.id === id 
+            ? { 
+                ...item, 
+                isPurchased: false, 
+                purchaseInfo: undefined 
+              } 
+            : item
         )
       })),
       
@@ -226,7 +253,7 @@ export const useWishlistStore = create<WishlistState>()(
           store: state.stores.length > 0 ? state.stores[0] : 'Local Shop',
           category: idea.category || (state.categories.length > 0 ? state.categories[0] : 'Lifestyle'),
           availability: 'Medium',
-          bought: false,
+          isPurchased: false,
           createdAt: new Date().toISOString()
         };
 
@@ -243,6 +270,27 @@ export const useWishlistStore = create<WishlistState>()(
     {
       name: 'wishlist-pro-tracker-storage',
       storage: createJSONStorage(() => localStorage),
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0 || !version) {
+          if (persistedState && persistedState.wishlistItems) {
+            persistedState.wishlistItems = persistedState.wishlistItems.map((item: any) => {
+              if (item.isPurchased === undefined) {
+                item.isPurchased = !!item.bought;
+              }
+              if (item.isPurchased && !item.purchaseInfo) {
+                item.purchaseInfo = {
+                  date: item.createdAt || new Date().toISOString(),
+                  price: item.price
+                };
+              }
+              delete item.bought;
+              return item;
+            });
+          }
+        }
+        return persistedState;
+      }
     }
   )
 );

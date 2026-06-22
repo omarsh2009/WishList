@@ -10,12 +10,12 @@ interface QuickLookScreenProps {
 
 export default function QuickLookScreen({ onSelectItem }: QuickLookScreenProps) {
   const wishlistItems = useWishlistStore((state) => state.wishlistItems);
-  const toggleBought = useWishlistStore((state) => state.toggleBought);
+  const markAsPurchased = useWishlistStore((state) => state.markAsPurchased);
   
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Filter out bought items or just show all active items
-  const activeItems = wishlistItems.filter(item => !item.bought);
+  // Filter out purchased items to show only active items
+  const activeItems = wishlistItems.filter(item => !item.isPurchased);
 
   const handleNext = () => {
     if (currentIndex < activeItems.length - 1) {
@@ -41,13 +41,15 @@ export default function QuickLookScreen({ onSelectItem }: QuickLookScreenProps) 
         </div>
         <h3 className="font-manrope text-lg font-bold text-on-surface">No active wishlist items</h3>
         <p className="text-xs text-on-surface-variant/75 mt-1 max-w-[240px] mx-auto">
-          Add items to your wishlist that are not marked as bought yet to inspect them in Quick Look.
+          Add items to your wishlist that are not marked as purchased yet to inspect them in Quick Look.
         </p>
       </div>
     );
   }
 
-  const item = activeItems[currentIndex];
+  // Cap the index to prevent out-of-bounds errors when items are marked as purchased
+  const safeIndex = currentIndex >= activeItems.length ? Math.max(0, activeItems.length - 1) : currentIndex;
+  const item = activeItems[safeIndex];
 
   const availabilityColors: Record<string, string> = {
     'High': 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/20',
@@ -126,11 +128,11 @@ export default function QuickLookScreen({ onSelectItem }: QuickLookScreenProps) 
               </button>
 
               <button
-                onClick={() => toggleBought(item.id)}
-                className="px-3.5 py-1.5 bg-primary text-white dark:bg-primary-container dark:text-white rounded-full text-xs font-semibold flex items-center gap-1 active:scale-95 transition-all shadow-xs"
+                onClick={() => markAsPurchased(item.id)}
+                className="px-3.5 py-1.5 bg-primary text-white dark:bg-primary-container dark:text-white rounded-full text-xs font-semibold flex items-center gap-1 active:scale-95 transition-all shadow-xs cursor-pointer"
               >
                 <Check size={12} strokeWidth={2.5} />
-                Bought
+                Purchased
               </button>
 
             </div>

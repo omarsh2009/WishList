@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { Sun, Moon, Plus, Trash2, Shield, Download, Upload, Check, Settings, BookOpen, AlertCircle } from 'lucide-react';
 import { useWishlistStore } from '../store/useWishlistStore';
+import ConfirmModal from './ui/ConfirmModal';
 
 export default function SettingsScreen() {
   const darkMode = useWishlistStore((state) => state.darkMode);
@@ -22,6 +23,9 @@ export default function SettingsScreen() {
   const [newStore, setNewStore] = useState('');
   const [showStatus, setShowStatus] = useState<'success' | 'error' | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
+  
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -193,11 +197,16 @@ export default function SettingsScreen() {
 
         {/* Categories list list view */}
         <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto no-scrollbar">
+          {categories.length === 0 && (
+            <div className="text-center py-4 text-xs font-medium text-on-surface-variant/50">
+              No categories added yet.
+            </div>
+          )}
           {categories.map((cat) => (
             <div key={cat} className="flex justify-between items-center py-1.5 px-2 bg-surface-container-low rounded-xl">
               <span className="text-xs font-semibold text-on-surface">{cat}</span>
               <button
-                onClick={() => deleteCategory(cat)}
+                onClick={() => setCategoryToDelete(cat)}
                 className="p-1 rounded-full text-on-error-container hover:bg-error-container/20 active:scale-90 transition-transform"
                 aria-label={`Delete category ${cat}`}
               >
@@ -235,11 +244,16 @@ export default function SettingsScreen() {
 
         {/* Stores list list view */}
         <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto no-scrollbar">
+          {stores.length === 0 && (
+            <div className="text-center py-4 text-xs font-medium text-on-surface-variant/50">
+              No stores added yet.
+            </div>
+          )}
           {stores.map((s) => (
             <div key={s} className="flex justify-between items-center py-1.5 px-2 bg-surface-container-low rounded-xl">
               <span className="text-xs font-semibold text-on-surface">{s}</span>
               <button
-                onClick={() => deleteStore(s)}
+                onClick={() => setStoreToDelete(s)}
                 className="p-1 rounded-full text-on-error-container hover:bg-error-container/20 active:scale-90 transition-transform"
                 aria-label={`Delete store ${s}`}
               >
@@ -295,6 +309,31 @@ export default function SettingsScreen() {
         WishList Pro Tracker v1.0.0 • Local-First Sandbox
       </div>
 
+      <ConfirmModal
+        isOpen={categoryToDelete !== null}
+        title="Delete Category"
+        message={`Are you sure you want to delete the "${categoryToDelete}" category?`}
+        confirmText="Delete"
+        isDestructive={true}
+        onConfirm={() => {
+          if (categoryToDelete) deleteCategory(categoryToDelete);
+          setCategoryToDelete(null);
+        }}
+        onCancel={() => setCategoryToDelete(null)}
+      />
+
+      <ConfirmModal
+        isOpen={storeToDelete !== null}
+        title="Delete Store"
+        message={`Are you sure you want to delete the "${storeToDelete}" store?`}
+        confirmText="Delete"
+        isDestructive={true}
+        onConfirm={() => {
+          if (storeToDelete) deleteStore(storeToDelete);
+          setStoreToDelete(null);
+        }}
+        onCancel={() => setStoreToDelete(null)}
+      />
     </div>
   );
 }
