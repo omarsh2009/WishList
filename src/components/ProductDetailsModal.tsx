@@ -104,9 +104,21 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
               <h2 className="font-manrope text-2xl font-bold tracking-tight text-on-surface">
                 {item.name}
               </h2>
-              <span className="font-manrope text-2xl font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
-                {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'}
-              </span>
+              <div className="flex flex-col items-end">
+                <span className="font-manrope text-2xl font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
+                  {item.price !== null ? `$${(item.price * (item.quantity || 1)).toFixed(2)}` : 'N/A'}
+                </span>
+                {(item.quantity || 1) > 1 && item.price !== null && (
+                  <span className="text-xs text-on-surface-variant font-medium">
+                    {item.quantity} × ${item.price.toFixed(2)}
+                  </span>
+                )}
+                {(item.quantity || 1) > 1 && item.price === null && (
+                  <span className="text-xs text-on-surface-variant font-medium">
+                    Qty: {item.quantity}
+                  </span>
+                )}
+              </div>
             </div>
             
             {/* Store & Category Tag Pill Area */}

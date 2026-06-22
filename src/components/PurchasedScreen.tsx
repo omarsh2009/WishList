@@ -33,13 +33,13 @@ export default function PurchasedScreen({ onSelectItem, onBack }: PurchasedScree
     })
     .sort((a, b) => {
       if (sortBy === 'PriceLowHigh') {
-        const aPrice = a.purchaseInfo?.price ?? a.price ?? 0;
-        const bPrice = b.purchaseInfo?.price ?? b.price ?? 0;
+        const aPrice = (a.purchaseInfo?.price ?? a.price ?? 0) * (a.quantity || 1);
+        const bPrice = (b.purchaseInfo?.price ?? b.price ?? 0) * (b.quantity || 1);
         return aPrice - bPrice;
       }
       if (sortBy === 'PriceHighLow') {
-        const aPrice = a.purchaseInfo?.price ?? a.price ?? 0;
-        const bPrice = b.purchaseInfo?.price ?? b.price ?? 0;
+        const aPrice = (a.purchaseInfo?.price ?? a.price ?? 0) * (a.quantity || 1);
+        const bPrice = (b.purchaseInfo?.price ?? b.price ?? 0) * (b.quantity || 1);
         return bPrice - aPrice;
       }
       
@@ -50,10 +50,10 @@ export default function PurchasedScreen({ onSelectItem, onBack }: PurchasedScree
     });
 
   // Calculate statistics
-  const totalItems = purchasedItems.length;
+  const totalItems = purchasedItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const totalValue = purchasedItems.reduce((acc, item) => {
     const price = item.purchaseInfo?.price ?? item.price;
-    return acc + (price || 0);
+    return acc + ((price || 0) * (item.quantity || 1));
   }, 0);
 
   return (
@@ -159,9 +159,14 @@ export default function PurchasedScreen({ onSelectItem, onBack }: PurchasedScree
                         <h3 className="font-manrope text-sm font-bold text-on-surface leading-tight truncate flex-1">
                           {item.name}
                         </h3>
-                        <span className="text-sm font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap shrink-0">
-                          {displayPrice !== null ? `$${displayPrice.toFixed(2)}` : 'N/A'}
-                        </span>
+                        <div className="flex items-baseline gap-1 shrink-0">
+                          <span className="text-sm font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
+                            {displayPrice !== null ? `$${(displayPrice * (item.quantity || 1)).toFixed(2)}` : 'N/A'}
+                          </span>
+                          {(item.quantity || 1) > 1 && (
+                            <span className="text-[10px] text-on-surface-variant font-bold">x{item.quantity}</span>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Store & Category Tag Pill Area */}

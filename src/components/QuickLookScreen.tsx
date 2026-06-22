@@ -100,9 +100,14 @@ export default function QuickLookScreen({ onSelectItem }: QuickLookScreenProps) 
                 <h3 className="font-manrope text-base font-bold text-on-surface line-clamp-1">
                   {item.name}
                 </h3>
-                <span className="font-manrope text-base font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
-                  {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'}
-                </span>
+                <div className="flex flex-col items-end shrink-0">
+                  <span className="font-manrope text-base font-extrabold text-primary dark:text-primary-fixed-dim whitespace-nowrap">
+                    {item.price !== null ? `$${(item.price * (item.quantity || 1)).toFixed(2)}` : 'N/A'}
+                  </span>
+                  {(item.quantity || 1) > 1 && (
+                    <span className="text-[10px] text-on-surface-variant font-bold leading-none">x{item.quantity}</span>
+                  )}
+                </div>
               </div>
               
               <div className="flex gap-2 mt-2">

@@ -33,6 +33,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   const [store, setStore] = useState('');
   const [category, setCategory] = useState('');
   const [availability, setAvailability] = useState<'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued'>('Medium');
+  const [quantity, setQuantity] = useState('1');
   const [link, setLink] = useState('');
   const [priceNotAvailable, setPriceNotAvailable] = useState(false);
 
@@ -52,6 +53,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
       setStore(editItem.store);
       setCategory(editItem.category);
       setAvailability(editItem.availability);
+      setQuantity(editItem.quantity?.toString() || '1');
       setLink(editItem.link || '');
     } else {
       // Default fallback categories/stores
@@ -90,6 +92,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
       store: store || 'Local Shop',
       category: category || 'Lifestyle',
       availability,
+      quantity: Math.max(1, parseInt(quantity, 10) || 1),
       link: link.trim() || undefined,
     };
 
@@ -304,6 +307,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
         </div>
 
         {/* Price & Availability row */}
+        {/* Price & Quantity row */}
         <div className="grid grid-cols-2 gap-4">
           
           <div className="flex flex-col gap-1.5">
@@ -338,6 +342,24 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
           </div>
 
           <div className="flex flex-col gap-1.5">
+            <label htmlFor="itemQuantity" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+              Quantity
+            </label>
+            <input 
+              type="number" 
+              id="itemQuantity"
+              min="1"
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner font-mono"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+          </div>
+
+        </div>
+
+        {/* Availability row */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="flex flex-col gap-1.5">
             <label htmlFor="itemAvailability" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
               Availability
             </label>
@@ -356,12 +378,10 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
               <option value="Discontinued">Discontinued</option>
             </select>
           </div>
-
         </div>
 
-        {/* Store & Category selectors */}
+        {/* Store & Category row */}
         <div className="grid grid-cols-2 gap-4">
-          
           <div className="flex flex-col gap-1.5">
             <label htmlFor="itemCategory" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
               Category
@@ -393,7 +413,6 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
               ))}
             </select>
           </div>
-
         </div>
 
         {/* Store Link input */}

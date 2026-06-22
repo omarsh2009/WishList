@@ -43,8 +43,8 @@ export default function HomeScreen({ onSelectItem, onNavigateToPurchased }: Home
   const activeItems = wishlistItems.filter(item => !item.isPurchased);
   const purchasedItems = wishlistItems.filter(item => item.isPurchased);
 
-  const wantedValue = activeItems.reduce((acc, item) => acc + (item.price || 0), 0);
-  const purchasedValue = purchasedItems.reduce((acc, item) => acc + (item.purchaseInfo?.price ?? item.price ?? 0), 0);
+  const wantedValue = activeItems.reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 1)), 0);
+  const purchasedValue = purchasedItems.reduce((acc, item) => acc + ((item.purchaseInfo?.price ?? item.price ?? 0) * (item.quantity || 1)), 0);
   const totalValue = wantedValue + purchasedValue;
 
   const availabilityColors: Record<string, string> = {
@@ -213,9 +213,14 @@ export default function HomeScreen({ onSelectItem, onNavigateToPurchased }: Home
                   </div>
 
                   <div className="flex justify-between items-center mt-3 pt-2 border-t border-outline-variant/10">
-                    <span className="text-sm font-extrabold text-primary dark:text-primary-fixed-dim">
-                      {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'}
-                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-sm font-extrabold text-primary dark:text-primary-fixed-dim">
+                        {item.price !== null ? `$${(item.price * (item.quantity || 1)).toFixed(2)}` : 'N/A'}
+                      </span>
+                      {(item.quantity || 1) > 1 && (
+                        <span className="text-[10px] text-on-surface-variant font-bold">x{item.quantity}</span>
+                      )}
+                    </div>
                     <span className="text-[10px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full font-medium">
                       {item.category}
                     </span>

@@ -32,6 +32,7 @@ export interface WishlistItem {
     date: string;
     price: number | null;
   };
+  quantity: number;
   createdAt: string;
 }
 
@@ -84,6 +85,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     availability: 'Medium',
     link: 'https://www.ikea.com',
     isPurchased: false,
+    quantity: 1,
     createdAt: new Date().toISOString()
   },
   {
@@ -98,6 +100,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     availability: 'Rare',
     link: 'https://www.bestbuy.com',
     isPurchased: false,
+    quantity: 1,
     createdAt: new Date().toISOString()
   },
   {
@@ -115,6 +118,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
       date: new Date().toISOString(),
       price: 245.00
     },
+    quantity: 1,
     createdAt: new Date().toISOString()
   }
 ];
@@ -254,6 +258,7 @@ export const useWishlistStore = create<WishlistState>()(
           category: idea.category || (state.categories.length > 0 ? state.categories[0] : 'Lifestyle'),
           availability: 'Medium',
           isPurchased: false,
+          quantity: 1,
           createdAt: new Date().toISOString()
         };
 
@@ -270,9 +275,9 @@ export const useWishlistStore = create<WishlistState>()(
     {
       name: 'wishlist-pro-tracker-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
       migrate: (persistedState: any, version: number) => {
-        if (version === 0 || !version) {
+        if (version === 0 || version === 1 || !version) {
           if (persistedState && persistedState.wishlistItems) {
             persistedState.wishlistItems = persistedState.wishlistItems.map((item: any) => {
               if (item.isPurchased === undefined) {
@@ -285,6 +290,11 @@ export const useWishlistStore = create<WishlistState>()(
                 };
               }
               delete item.bought;
+              
+              if (item.quantity === undefined) {
+                item.quantity = 1;
+              }
+              
               return item;
             });
           }
