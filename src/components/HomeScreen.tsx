@@ -27,7 +27,7 @@ export default function HomeScreen({ onSelectItem, onNavigateToPurchased }: Home
 
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.store.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchQuery.toLowerCase());
+                            (item.notes || '').toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
 

@@ -16,7 +16,6 @@ export default function AddIdeaScreen({ editIdea, onSaved, onCancel }: AddIdeaSc
   const categories = useWishlistStore((state) => state.categories);
 
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [targetBudget, setTargetBudget] = useState('');
   const [notes, setNotes] = useState('');
   const [category, setCategory] = useState('');
@@ -26,7 +25,6 @@ export default function AddIdeaScreen({ editIdea, onSaved, onCancel }: AddIdeaSc
   useEffect(() => {
     if (editIdea) {
       setTitle(editIdea.title);
-      setDescription(editIdea.description || '');
       setTargetBudget(editIdea.targetBudget ? editIdea.targetBudget.toString() : '');
       setNotes(editIdea.notes || '');
       setCategory(editIdea.category || '');
@@ -55,7 +53,6 @@ export default function AddIdeaScreen({ editIdea, onSaved, onCancel }: AddIdeaSc
 
     const payload = {
       title: title.trim(),
-      description: description.trim() || undefined,
       targetBudget: parsedBudget,
       notes: notes.trim() || undefined,
       category: category || undefined,
@@ -148,30 +145,15 @@ export default function AddIdeaScreen({ editIdea, onSaved, onCancel }: AddIdeaSc
           />
         </div>
 
-        {/* Description textarea */}
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="ideaDescription" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-            Description
-          </label>
-          <textarea 
-            id="ideaDescription"
-            rows={3}
-            placeholder="Details, specifications, or thoughts..." 
-            className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner resize-none"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
         {/* Notes textarea */}
         <div className="flex flex-col gap-1.5">
           <label htmlFor="ideaNotes" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-            Notes
+            Notes (Optional)
           </label>
           <textarea 
             id="ideaNotes"
-            rows={2}
-            placeholder="Any additional thoughts..." 
+            rows={4}
+            placeholder="Any additional thoughts, specifications, or details..." 
             className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner resize-none"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}

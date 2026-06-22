@@ -6,7 +6,6 @@ export type IdeaStatus = 'Active' | 'Converted' | 'Archived';
 export interface Idea {
   id: string;
   title: string;
-  description?: string;
   targetBudget?: number;
   notes?: string;
   category?: string;
@@ -21,8 +20,7 @@ export interface WishlistItem {
   name: string;
   price: number | null;
   photo: string;
-  description: string;
-  specialNotes?: string;
+  notes?: string;
   store: string;
   category: string;
   availability: 'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued';
@@ -78,8 +76,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     name: 'Minimalist Desk Lamp',
     price: 89.00,
     photo: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=400&q=80',
-    description: 'Matte black aluminum lamp with adjustable warm LED, ideal for late-night reading.',
-    specialNotes: 'Perfect matching accent for the main workspace setup.',
+    notes: 'Perfect matching accent for the main workspace setup.',
     store: 'IKEA',
     category: 'Home Decor',
     availability: 'Medium',
@@ -93,8 +90,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     name: 'Mechanical Keyboard (V3)',
     price: 189.00,
     photo: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=400&q=80',
-    description: 'Hot-swappable tactile mechanical keyboard with custom brass plate and premium walnut case.',
-    specialNotes: 'Buy with brown switches. Add custom keycaps later.',
+    notes: 'Buy with brown switches. Add custom keycaps later.',
     store: 'Best Buy',
     category: 'Tech',
     availability: 'Rare',
@@ -108,8 +104,7 @@ const INITIAL_WISHLIST: WishlistItem[] = [
     name: 'Premium Leather Boots',
     price: 245.00,
     photo: 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=400&q=80',
-    description: 'Handcrafted full-grain leather boots designed for all-season durability and comfort.',
-    specialNotes: 'Size 10 fits best. Fits slightly large.',
+    notes: 'Size 10 fits best. Fits slightly large.',
     store: 'Local Shop',
     category: 'Apparel',
     availability: 'Discontinued',
@@ -252,8 +247,7 @@ export const useWishlistStore = create<WishlistState>()(
           name: idea.title,
           price: null, // Price not available yet
           photo: '', // To be added later
-          description: idea.description || '',
-          specialNotes: idea.notes,
+          notes: idea.notes || undefined,
           store: state.stores.length > 0 ? state.stores[0] : 'Local Shop',
           category: idea.category || (state.categories.length > 0 ? state.categories[0] : 'Lifestyle'),
           availability: 'Medium',
@@ -275,9 +269,9 @@ export const useWishlistStore = create<WishlistState>()(
     {
       name: 'wishlist-pro-tracker-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       migrate: (persistedState: any, version: number) => {
-        if (version === 0 || version === 1 || !version) {
+        if (version === 0 || version === 1 || version === 2 || !version) {
           if (persistedState && persistedState.wishlistItems) {
             persistedState.wishlistItems = persistedState.wishlistItems.map((item: any) => {
               if (item.isPurchased === undefined) {
@@ -295,7 +289,27 @@ export const useWishlistStore = create<WishlistState>()(
                 item.quantity = 1;
               }
               
+              let currentNotes = item.notes || item.specialNotes || '';
+              if (!currentNotes && item.description) {
+                currentNotes = item.description;
+              }
+              item.notes = currentNotes || undefined;
+              
+              delete item.description;
+              delete item.specialNotes;
+              
               return item;
+            });
+          }
+          if (persistedState && persistedState.ideas) {
+            persistedState.ideas = persistedState.ideas.map((idea: any) => {
+              let currentNotes = idea.notes || '';
+              if (!currentNotes && idea.description) {
+                currentNotes = idea.description;
+              }
+              idea.notes = currentNotes || undefined;
+              delete idea.description;
+              return idea;
             });
           }
         }

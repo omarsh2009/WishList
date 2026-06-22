@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Eye, PlusCircle, Settings, Gift, Lightbulb } from 'lucide-react';
+import { Home, PlusCircle, Settings, Gift, Lightbulb } from 'lucide-react';
 import { useWishlistStore, WishlistItem, Idea } from '../store/useWishlistStore';
 import HomeScreen from './HomeScreen';
 import AddItemScreen from './AddItemScreen';
-import QuickLookScreen from './QuickLookScreen';
 import SettingsScreen from './SettingsScreen';
 import ProductDetailsModal from './ProductDetailsModal';
 import IdeasScreen from './IdeasScreen';
@@ -14,7 +13,7 @@ import IdeaDetailsModal from './IdeaDetailsModal';
 import PurchasedScreen from './PurchasedScreen';
 
 export default function MobileShell() {
-  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'ideas' | 'addIdea' | 'quicklook' | 'settings' | 'purchased'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'ideas' | 'addIdea' | 'settings' | 'purchased'>('home');
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<WishlistItem | null>(null);
   const [selectedIdeaForDetails, setSelectedIdeaForDetails] = useState<Idea | null>(null);
   const [editingItem, setEditingItem] = useState<WishlistItem | null>(null);
@@ -151,10 +150,6 @@ export default function MobileShell() {
           />
         )}
         
-        {activeTab === 'quicklook' && (
-          <QuickLookScreen onSelectItem={handleSelectItem} />
-        )}
-        
         {activeTab === 'settings' && (
           <SettingsScreen />
         )}
@@ -184,7 +179,7 @@ export default function MobileShell() {
           aria-label="Wishlist feed"
         >
           <Home size={19} strokeWidth={activeTab === 'home' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
-          <span className="text-[10px] tracking-wide">Wishes</span>
+          <span className="text-[10px] tracking-wide">Wishlist</span>
         </button>
 
         {/* Navigation Button Add Item */}
@@ -219,23 +214,6 @@ export default function MobileShell() {
         >
           <Lightbulb size={19} strokeWidth={(activeTab === 'ideas' || activeTab === 'addIdea') ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
           <span className="text-[10px] tracking-wide">Ideas</span>
-        </button>
-
-        {/* Navigation Button Quick Look */}
-        <button
-          onClick={() => {
-            setEditingItem(null);
-            setActiveTab('quicklook');
-          }}
-          className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
-            activeTab === 'quicklook' 
-              ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
-              : 'text-on-surface-variant/60 hover:text-on-surface'
-          }`}
-          aria-label="Quick look carousel"
-        >
-          <Eye size={19} strokeWidth={activeTab === 'quicklook' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
-          <span className="text-[10px] tracking-wide">Quick Look</span>
         </button>
 
         {/* Navigation Button Settings */}

@@ -99,22 +99,13 @@ export default function IdeaDetailsModal({ idea, onClose, onEdit, onViewWishlist
 
           <hr className="border-outline-variant/30 my-4" />
 
-          <div className="mb-5">
-            <h3 className="text-xs uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2">
-              Description
-            </h3>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
-              {idea.description || 'No description provided.'}
-            </p>
-          </div>
-
           {idea.notes && (
             <div className="mb-6 p-3 bg-secondary-container/10 border border-secondary-container/20 rounded-xl">
               <h3 className="text-xs uppercase tracking-wider text-on-secondary-container font-bold mb-1">
                 Notes
               </h3>
-              <p className="text-sm text-on-surface font-medium italic">
-                "{idea.notes}"
+              <p className="text-sm text-on-surface font-medium italic whitespace-pre-wrap">
+                {idea.notes}
               </p>
             </div>
           )}

@@ -28,8 +28,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [photo, setPhoto] = useState('');
-  const [description, setDescription] = useState('');
-  const [specialNotes, setSpecialNotes] = useState('');
+  const [notes, setNotes] = useState('');
   const [store, setStore] = useState('');
   const [category, setCategory] = useState('');
   const [availability, setAvailability] = useState<'High' | 'High-Medium' | 'Medium' | 'Medium-Low' | 'Low' | 'Rare' | 'Discontinued'>('Medium');
@@ -48,8 +47,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
       setPrice(editItem.price !== null ? editItem.price.toString() : '');
       setPriceNotAvailable(editItem.price === null);
       setPhoto(editItem.photo);
-      setDescription(editItem.description);
-      setSpecialNotes(editItem.specialNotes || '');
+      setNotes(editItem.notes || '');
       setStore(editItem.store);
       setCategory(editItem.category);
       setAvailability(editItem.availability);
@@ -87,8 +85,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
       name: name.trim(),
       price: finalPrice,
       photo: photo.trim(),
-      description: description.trim(),
-      specialNotes: specialNotes.trim() || undefined,
+      notes: notes.trim() || undefined,
       store: store || 'Local Shop',
       category: category || 'Lifestyle',
       availability,
@@ -430,33 +427,18 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
           />
         </div>
 
-        {/* Description textarea */}
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="itemDescription" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-            Description
-          </label>
-          <textarea 
-            id="itemDescription"
-            rows={3}
-            placeholder="Describe what makes this item special or details like size/color..." 
-            className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner resize-none"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
-        {/* Special Notes textarea */}
+        {/* Notes textarea */}
         <div className="flex flex-col gap-1.5">
           <label htmlFor="itemNotes" className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-            Special Notes (Optional)
+            Notes (Optional)
           </label>
-          <input 
-            type="text" 
+          <textarea 
             id="itemNotes"
+            rows={3}
             placeholder="e.g. Christmas gift ideas, sizing fits large..." 
-            className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner"
-            value={specialNotes}
-            onChange={(e) => setSpecialNotes(e.target.value)}
+            className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 text-sm text-on-surface outline-hidden focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all shadow-inner resize-none"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
           />
         </div>
 

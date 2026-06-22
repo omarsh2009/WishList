@@ -136,26 +136,15 @@ export default function ProductDetailsModal({ item, onClose, onEdit }: ProductDe
 
           <hr className="border-outline-variant/30 my-4" />
 
-          {/* Product Description */}
-          <div className="mb-5">
-            <h3 className="text-xs uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 flex items-center gap-1.5">
-              <Eye size={12} />
-              Description
-            </h3>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
-              {item.description || 'No description provided for this item.'}
-            </p>
-          </div>
-
-          {/* Special Notes (if available) */}
-          {item.specialNotes && (
+          {/* Notes (if available) */}
+          {item.notes && (
             <div className="mb-6 p-3 bg-secondary-container/10 border border-secondary-container/20 rounded-xl">
               <h3 className="text-xs uppercase tracking-wider text-on-secondary-container font-bold mb-1 flex items-center gap-1.5">
                 <Heart size={12} className="fill-current" />
                 Notes
               </h3>
-              <p className="text-sm text-on-surface font-medium italic">
-                "{item.specialNotes}"
+              <p className="text-sm text-on-surface font-medium italic whitespace-pre-wrap">
+                {item.notes}
               </p>
             </div>
           )}

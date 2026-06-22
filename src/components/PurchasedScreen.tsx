@@ -27,7 +27,7 @@ export default function PurchasedScreen({ onSelectItem, onBack }: PurchasedScree
     .filter((item) => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.store.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (item.notes || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.category.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     })
