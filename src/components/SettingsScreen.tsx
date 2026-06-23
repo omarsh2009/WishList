@@ -119,7 +119,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <div className="flex flex-col flex-1 pb-24 px-4 overflow-y-auto no-scrollbar">
+    <div className="flex flex-col flex-1 px-4">
       
       {/* Header title */}
       <div className="flex items-center gap-2.5 py-3 mb-5 border-b border-outline-variant/10">

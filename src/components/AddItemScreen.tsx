@@ -180,7 +180,7 @@ export default function AddItemScreen({ editItem, onSaved, onCancel }: AddItemSc
   };
 
   return (
-    <div className="flex flex-col flex-1 pb-24 px-4">
+    <div className="flex flex-col flex-1 px-4">
       
       {/* Header bar */}
       <div className="flex items-center gap-3 py-3 mb-4 border-b border-outline-variant/10">

@@ -98,10 +98,10 @@ export default function MobileShell() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between max-w-md mx-auto w-full bg-surface-background shadow-premium border-x border-outline-variant/20 relative overflow-hidden">
+    <div className="h-screen flex flex-col max-w-md mx-auto w-full bg-surface-background shadow-premium border-x border-outline-variant/20 relative">
       
       {/* 1. App Top Header Banner */}
-      <header className="sticky top-0 z-40 bg-surface-background/80 backdrop-blur-md border-b border-outline-variant/15 px-4 py-3.5 flex justify-between items-center">
+      <header className="shrink-0 z-40 bg-surface-background/80 backdrop-blur-md border-b border-outline-variant/15 px-4 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Gift className="text-primary dark:text-primary-fixed-dim" size={20} strokeWidth={2.5} />
           <h1 className="font-manrope text-lg font-extrabold tracking-tight text-on-surface">
@@ -116,7 +116,7 @@ export default function MobileShell() {
       </header>
 
       {/* 2. Main Content Screen Container Scrollport */}
-      <main className="flex-1 flex flex-col overflow-y-auto no-scrollbar pt-2 bg-surface-background relative">
+      <main className="flex-1 overflow-y-auto no-scrollbar pt-2 bg-surface-background relative flex flex-col">
         {activeTab === 'home' && (
           <HomeScreen 
             onSelectItem={handleSelectItem} 
@@ -162,8 +162,8 @@ export default function MobileShell() {
         )}
       </main>
 
-      {/* 3. Sticky Bottom App Navigation Bar */}
-      <nav className="sticky bottom-0 z-40 bg-surface-background/95 backdrop-blur-md border-t border-outline-variant/20 flex justify-around items-center py-2.5 px-3 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-2xl">
+      {/* 3. Bottom App Navigation Bar */}
+      <nav className="shrink-0 z-40 bg-surface-background/95 backdrop-blur-md border-t border-outline-variant/20 flex justify-around items-center py-2.5 px-3 pb-[calc(12px+env(safe-area-inset-bottom))] shadow-2xl">
         
         {/* Navigation Button Home */}
         <button

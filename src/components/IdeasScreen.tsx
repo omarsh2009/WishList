@@ -32,7 +32,7 @@ export default function IdeasScreen({ onSelectIdea, onCreateIdea }: IdeasScreenP
   };
 
   return (
-    <div className="flex flex-col flex-1 pb-20">
+    <div className="flex flex-col flex-1">
       
       {/* Header & New Idea Button */}
       <div className="px-4 py-2 mb-2 flex items-center justify-between">

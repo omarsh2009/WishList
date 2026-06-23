@@ -58,7 +58,7 @@ export default function HomeScreen({ onSelectItem, onNavigateToPurchased }: Home
   };
 
   return (
-    <div className="flex flex-col flex-1 pb-20">
+    <div className="flex flex-col flex-1">
       
       {/* Premium Dashboard Metrics Summary */}
       <div className="bg-gradient-to-br from-primary-container to-primary text-white p-5 rounded-2xl shadow-premium mb-6 border border-white/5 mx-4 mt-2">
