@@ -116,7 +116,7 @@ export default function MobileShell() {
       </header>
 
       {/* 2. Main Content Screen Container Scrollport */}
-      <main className="flex-1 overflow-y-auto no-scrollbar pt-2 bg-surface-background relative flex flex-col">
+      <main className="flex-1 min-h-0 overflow-y-auto no-scrollbar pt-2 bg-surface-background relative flex flex-col">
         {activeTab === 'home' && (
           <HomeScreen 
             onSelectItem={handleSelectItem} 
