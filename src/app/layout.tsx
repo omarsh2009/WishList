@@ -54,10 +54,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
+      className={`${manrope.variable} ${inter.variable} h-full overflow-hidden antialiased`}
       suppressHydrationWarning
     >
-      <body className="h-full bg-surface-background text-on-surface font-inter transition-colors duration-300">
+      <body className="h-full overflow-hidden bg-surface-background text-on-surface font-inter transition-colors duration-300">
         <script
           dangerouslySetInnerHTML={{
             __html: `
