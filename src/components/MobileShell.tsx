@@ -98,7 +98,7 @@ export default function MobileShell() {
   };
 
   return (
-    <div className="h-screen flex flex-col max-w-md mx-auto w-full bg-surface-background shadow-premium border-x border-outline-variant/20 relative">
+    <div className="flex-1 min-h-0 flex flex-col max-w-md mx-auto w-full bg-surface-background shadow-premium border-x border-outline-variant/20 relative">
       
       {/* 1. App Top Header Banner */}
       <header className="shrink-0 z-40 bg-surface-background/80 backdrop-blur-md border-b border-outline-variant/15 px-4 py-3.5 flex justify-between items-center">
