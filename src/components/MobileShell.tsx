@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Home, PlusCircle, Settings, Gift, Lightbulb } from 'lucide-react';
-import { useWishlistStore, WishlistItem, Idea } from '../store/useWishlistStore';
+import { useWishlistStore, WishlistItem, Idea, Project } from '../store/useWishlistStore';
 import HomeScreen from './HomeScreen';
 import AddItemScreen from './AddItemScreen';
 import SettingsScreen from './SettingsScreen';
@@ -11,16 +11,24 @@ import IdeasScreen from './IdeasScreen';
 import AddIdeaScreen from './AddIdeaScreen';
 import IdeaDetailsModal from './IdeaDetailsModal';
 import PurchasedScreen from './PurchasedScreen';
+import AddMenuModal from './AddMenuModal';
+import AddProjectScreen from './AddProjectScreen';
+import ProjectDetailsScreen from './ProjectDetailsScreen';
+import ProjectsScreen from './ProjectsScreen';
 
 export default function MobileShell() {
-  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'ideas' | 'addIdea' | 'settings' | 'purchased'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'add' | 'projects' | 'addProject' | 'projectDetails' | 'ideas' | 'addIdea' | 'settings' | 'purchased'>('home');
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<WishlistItem | null>(null);
   const [selectedIdeaForDetails, setSelectedIdeaForDetails] = useState<Idea | null>(null);
+  const [selectedProjectForDetails, setSelectedProjectForDetails] = useState<Project | null>(null);
   const [editingItem, setEditingItem] = useState<WishlistItem | null>(null);
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
   
   const wishlistItems = useWishlistStore((state) => state.wishlistItems);
+  const projects = useWishlistStore((state) => state.projects);
+  const deleteProject = useWishlistStore((state) => state.deleteProject);
   const darkMode = useWishlistStore((state) => state.darkMode);
 
   // Avoid hydration mismatch issues with Zustand persist middleware
@@ -128,7 +136,52 @@ export default function MobileShell() {
           <AddItemScreen 
             editItem={editingItem} 
             onSaved={handleItemSaved} 
-            onCancel={editingItem ? handleCancelEdit : undefined} 
+            onCancel={editingItem ? handleCancelEdit : () => setActiveTab('home')} 
+          />
+        )}
+
+        {activeTab === 'projects' && (
+          <ProjectsScreen
+            onSelectProject={(projectId) => {
+              const project = projects?.find(p => p.id === projectId);
+              if (project) {
+                setSelectedProjectForDetails(project);
+                setActiveTab('projectDetails');
+              }
+            }}
+            onCreateProject={() => {
+              setSelectedProjectForDetails(null);
+              setActiveTab('addProject');
+            }}
+          />
+        )}
+
+        {activeTab === 'addProject' && (
+          <AddProjectScreen 
+            editProject={selectedProjectForDetails}
+            onSaved={(projectId) => {
+              const project = projects?.find(p => p.id === projectId);
+              if (project) {
+                setSelectedProjectForDetails(project);
+                setActiveTab('projectDetails');
+              } else {
+                setActiveTab('projects');
+              }
+            }}
+            onCancel={() => setActiveTab(selectedProjectForDetails ? 'projectDetails' : 'projects')}
+          />
+        )}
+
+        {activeTab === 'projectDetails' && selectedProjectForDetails && (
+          <ProjectDetailsScreen 
+            project={selectedProjectForDetails}
+            onBack={() => setActiveTab('projects')}
+            onEdit={() => setActiveTab('addProject')}
+            onDelete={() => {
+              deleteProject(selectedProjectForDetails.id);
+              setSelectedProjectForDetails(null);
+              setActiveTab('projects');
+            }}
           />
         )}
 
@@ -182,21 +235,18 @@ export default function MobileShell() {
           <span className="text-[10px] tracking-wide">Wishlist</span>
         </button>
 
-        {/* Navigation Button Add Item */}
+        {/* Navigation Button Add */}
         <button
-          onClick={() => {
-            setEditingItem(null);
-            setActiveTab('add');
-          }}
+          onClick={() => setIsAddMenuOpen(true)}
           className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl touch-highlight transition-all active:scale-95 ${
-            activeTab === 'add' 
+            (activeTab === 'add' || activeTab === 'addProject')
               ? 'text-primary dark:text-primary-fixed-dim font-bold bg-primary/5 dark:bg-primary/10 shadow-xs' 
               : 'text-on-surface-variant/60 hover:text-on-surface'
           }`}
-          aria-label="Add a wish item"
+          aria-label="Add a wish item or project"
         >
-          <PlusCircle size={19} strokeWidth={activeTab === 'add' ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
-          <span className="text-[10px] tracking-wide">Add Item</span>
+          <PlusCircle size={19} strokeWidth={(activeTab === 'add' || activeTab === 'addProject') ? 2.5 : 2} className="transition-transform duration-300 active:scale-110" />
+          <span className="text-[10px] tracking-wide">Add</span>
         </button>
 
         {/* Navigation Button Ideas */}
@@ -261,6 +311,17 @@ export default function MobileShell() {
         />
       )}
 
+      <AddMenuModal 
+        isOpen={isAddMenuOpen}
+        onClose={() => setIsAddMenuOpen(false)}
+        onSelectSingleItem={() => {
+          setEditingItem(null);
+          setActiveTab('add');
+        }}
+        onSelectProject={() => {
+          setActiveTab('projects');
+        }}
+      />
     </div>
   );
 }

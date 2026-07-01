@@ -15,6 +15,14 @@ export interface Idea {
   wishlistItemId?: string;
 }
 
+export interface Project {
+  id: string;
+  name: string;
+  budget?: number | null;
+  notes?: string;
+  createdAt: string;
+}
+
 export interface WishlistItem {
   id: string;
   name: string;
@@ -37,6 +45,7 @@ export interface WishlistItem {
 interface WishlistState {
   wishlistItems: WishlistItem[];
   ideas: Idea[];
+  projects: Project[];
   categories: string[];
   stores: string[];
   darkMode: boolean;
@@ -65,6 +74,11 @@ interface WishlistState {
   updateIdea: (id: string, updatedFields: Partial<Idea>) => void;
   deleteIdea: (id: string) => void;
   convertToWishlistItem: (ideaId: string) => void;
+  
+  // Project management
+  addProject: (project: Omit<Project, 'id' | 'createdAt'>) => string;
+  updateProject: (id: string, updatedFields: Partial<Project>) => void;
+  deleteProject: (id: string) => void;
 }
 
 const DEFAULT_CATEGORIES = ['Tech', 'Home Decor', 'Apparel', 'Books', 'Fitness', 'Lifestyle'];
@@ -123,6 +137,7 @@ export const useWishlistStore = create<WishlistState>()(
     (set) => ({
       wishlistItems: INITIAL_WISHLIST,
       ideas: [],
+      projects: [],
       categories: DEFAULT_CATEGORIES,
       stores: DEFAULT_STORES,
       darkMode: false,
@@ -265,6 +280,31 @@ export const useWishlistStore = create<WishlistState>()(
           )
         };
       }),
+
+      addProject: (project) => {
+        const newId = crypto.randomUUID();
+        set((state) => ({
+          projects: [
+            ...(state.projects || []),
+            {
+              ...project,
+              id: newId,
+              createdAt: new Date().toISOString()
+            }
+          ]
+        }));
+        return newId;
+      },
+      
+      updateProject: (id, updatedFields) => set((state) => ({
+        projects: (state.projects || []).map((project) => 
+          project.id === id ? { ...project, ...updatedFields } : project
+        )
+      })),
+      
+      deleteProject: (id) => set((state) => ({
+        projects: (state.projects || []).filter((project) => project.id !== id)
+      })),
     }),
     {
       name: 'wishlist-pro-tracker-storage',
@@ -311,6 +351,9 @@ export const useWishlistStore = create<WishlistState>()(
               delete idea.description;
               return idea;
             });
+          }
+          if (persistedState && !persistedState.projects) {
+            persistedState.projects = [];
           }
         }
         return persistedState;
